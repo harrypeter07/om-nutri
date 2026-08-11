@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { CheckCircle2, MessageCircle, QrCode, ShieldCheck, CreditCard, Sparkles, ChevronRight } from "lucide-react";
+import { CheckCircle2, MessageCircle, QrCode, ShieldCheck, Sparkles, ChevronRight, Lock, Truck, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -36,16 +36,16 @@ type FormValues = z.infer<typeof schema>;
 export const Route = createFileRoute("/checkout")({
   head: () => ({
     meta: [
-      { title: "Checkout | OM Nutrition Panipat — Pay Online via UPI QR" },
+      { title: "Checkout | OM Nutrition Panipat — Secure Payment" },
       {
         name: "description",
         content:
-          "Enter your delivery details and pay directly online via pre-filled UPI QR code or confirm your order on WhatsApp.",
+          "Complete your order details and choose UPI Payment or Cash on Delivery for fast delivery in Panipat.",
       },
       { property: "og:title", content: "Checkout — OM Nutrition Panipat" },
       {
         property: "og:description",
-        content: "Pay online via UPI QR code or confirm order on WhatsApp. Fast delivery in Panipat.",
+        content: "Pay online via UPI or Cash on Delivery. 100% genuine sealed supplements.",
       },
       { property: "og:url", content: "/checkout" },
       { name: "robots", content: "noindex" },
@@ -58,8 +58,8 @@ export const Route = createFileRoute("/checkout")({
 function Checkout() {
   const { items, clear } = useCart();
   const total = cartTotal(items);
-  const [placed, setPlaced] = useState<{ message: string; paymentMode: "UPI_ONLINE" | "WHATSAPP_COD" } | null>(null);
-  const [paymentMode, setPaymentMode] = useState<"UPI_ONLINE" | "WHATSAPP_COD">("WHATSAPP_COD");
+  const [placed, setPlaced] = useState<{ orderId: string; message: string; paymentMode: "UPI_ONLINE" | "WHATSAPP_COD" } | null>(null);
+  const [paymentMode, setPaymentMode] = useState<"UPI_ONLINE" | "WHATSAPP_COD">("UPI_ONLINE");
   const [showQr, setShowQr] = useState<boolean>(false);
   const [upiQrUrl, setUpiQrUrl] = useState<string | null>(null);
   const [isGeneratingQr, setIsGeneratingQr] = useState<boolean>(false);
@@ -97,28 +97,50 @@ function Checkout() {
     defaultValues: { customer_name: "", phone: "", address: "", city: "Panipat", pincode: "" },
   });
 
+  // Industry-grade Order Placed Confirmation Screen
   if (placed) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
-        <span className="grid mx-auto size-16 place-items-center rounded-full bg-emerald-100 text-emerald-600">
-          <CheckCircle2 className="size-10 stroke-[2.5]" />
+        <span className="grid mx-auto size-20 place-items-center rounded-full bg-emerald-100 text-emerald-600 ring-8 ring-emerald-50">
+          <CheckCircle2 className="size-12 stroke-[2.2]" />
         </span>
-        <h1 className="mt-6 text-3xl font-black tracking-tight text-black">
-          {placed.paymentMode === "UPI_ONLINE" ? "Payment QR Generated & Order Received!" : "Order Received!"}
-        </h1>
-        <p className="mt-3 text-sm font-medium text-gray-600 leading-relaxed">
-          {placed.paymentMode === "UPI_ONLINE"
-            ? `Thank you! Your order has been placed. We've sent order details to ${site.owner} on WhatsApp to verify your payment & dispatch.`
-            : `We've opened WhatsApp with your order summary — hit send so ${site.owner} can confirm stock and delivery.`}
-        </p>
+        <div className="mt-6">
+          <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-black text-emerald-800 uppercase tracking-wider">
+            Order Ref: #{placed.orderId.slice(-6).toUpperCase()}
+          </span>
+          <h1 className="mt-3 text-3xl font-black tracking-tight text-black sm:text-4xl">
+            Order Successfully Placed!
+          </h1>
+          <p className="mt-3 text-sm font-semibold text-gray-600 leading-relaxed max-w-md mx-auto">
+            Thank you, <strong className="text-black">{form.getValues("customer_name") || "Customer"}</strong>!
+            Your order has been recorded. Our store team is preparing your package for local delivery in Panipat.
+          </p>
+        </div>
 
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Button variant="whatsapp" size="lg" asChild>
+        <div className="mt-8 rounded-2xl border border-gray-200 bg-gray-50 p-5 text-left text-xs space-y-2">
+          <div className="flex justify-between border-b border-gray-200 pb-2 font-bold text-gray-700">
+            <span>Payment Method:</span>
+            <span className="text-black font-black uppercase">
+              {placed.paymentMode === "UPI_ONLINE" ? "UPI Payment (Online)" : "Cash on Delivery (COD)"}
+            </span>
+          </div>
+          <div className="flex justify-between border-b border-gray-200 pb-2 font-bold text-gray-700">
+            <span>Total Payable:</span>
+            <span className="text-black font-black text-sm">{currency(total || 0)}</span>
+          </div>
+          <div className="flex justify-between font-semibold text-gray-600 pt-1">
+            <span>Delivery Location:</span>
+            <span className="text-black font-bold">{form.getValues("city") || "Panipat"}</span>
+          </div>
+        </div>
+
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button variant="whatsapp" size="lg" className="w-full sm:w-auto font-black uppercase tracking-wider py-6" asChild>
             <a href={whatsappLink(placed.message)} target="_blank" rel="noreferrer">
-              <MessageCircle /> Open Order on WhatsApp
+              <MessageCircle className="size-5" /> Track & Confirm Order Support
             </a>
           </Button>
-          <Button variant="soft" size="lg" asChild>
+          <Button variant="soft" size="lg" className="w-full sm:w-auto font-black uppercase tracking-wider py-6" asChild>
             <Link to="/products" search={{}}>
               Continue Shopping
             </Link>
@@ -143,6 +165,8 @@ function Checkout() {
   }
 
   const onSubmit = async (values: FormValues) => {
+    let res: { id: string } = { id: `ord_${Date.now()}` };
+
     const payload = {
       ...values,
       items: items.map((i) => ({
@@ -155,37 +179,38 @@ function Checkout() {
     };
 
     try {
-      await placeOrder({ data: payload });
+      const result = await placeOrder({ data: payload });
+      if (result && result.id) res = result;
     } catch {
       toast.error("Could not save your order. Please try again or message us on WhatsApp.");
       return;
     }
 
-    const modeText = paymentMode === "UPI_ONLINE" ? "Online UPI QR Payment" : "Pay on Delivery (COD)";
+    const modeText = paymentMode === "UPI_ONLINE" ? "UPI Payment (Online)" : "Cash on Delivery (COD)";
     const utrText = utrNumber.trim() ? `\nUPI UTR / Ref: ${utrNumber.trim()}` : "";
 
     const message = [
-      "New Order — OM Nutrition",
-      `Payment Mode: ${modeText}${utrText}`,
-      `Name: ${values.customer_name}`,
-      `Phone: ${values.phone}`,
-      `Address: ${values.address}, ${values.city} - ${values.pincode}`,
-      "Items:",
+      `New Order — OM Nutrition (#${res.id.slice(-6).toUpperCase()})`,
+      `Payment Method: ${modeText}${utrText}`,
+      `Customer Name: ${values.customer_name}`,
+      `Contact Phone: ${values.phone}`,
+      `Delivery Address: ${values.address}, ${values.city} - ${values.pincode}`,
+      "Order Items:",
       ...items.map((i) => `- ${i.qty} x ${i.name} — ${currency(i.price * i.qty)}`),
-      `Total Amount: ${currency(total)}`,
+      `Total Payable: ${currency(total)}`,
     ].join("\n");
 
     clear();
-    setPlaced({ message, paymentMode });
-    window.open(whatsappLink(message), "_blank", "noopener,noreferrer");
+    setPlaced({ orderId: res.id, message, paymentMode });
+    toast.success("Order placed successfully!");
   };
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6">
-      <div className="mb-8">
+      <div className="mb-8 border-b border-gray-200 pb-5">
         <h1 className="text-3xl font-black tracking-tight text-black sm:text-4xl">Checkout</h1>
         <p className="mt-2 text-xs font-semibold text-gray-600">
-          Enter your delivery details and choose your preferred payment option.
+          Enter your delivery details and choose your preferred payment option to place your order.
         </p>
       </div>
 
@@ -196,11 +221,11 @@ function Checkout() {
           onSubmit={form.handleSubmit(onSubmit)}
           noValidate
         >
-          {/* Section 1: Customer Details */}
+          {/* Section 1: Customer Delivery Details */}
           <div>
             <h2 className="text-sm font-black uppercase tracking-wider text-black mb-4 flex items-center gap-2">
               <span className="grid size-6 place-items-center rounded-full bg-black text-[11px] text-white">1</span>
-              Delivery Details
+              Delivery Address
             </h2>
             <div className="space-y-4">
               <div>
@@ -210,7 +235,7 @@ function Checkout() {
               </div>
 
               <div>
-                <Label htmlFor="phone" className="text-xs font-bold text-gray-700">WhatsApp Mobile Number *</Label>
+                <Label htmlFor="phone" className="text-xs font-bold text-gray-700">Contact Mobile Number *</Label>
                 <Input
                   id="phone"
                   inputMode="numeric"
@@ -255,11 +280,11 @@ function Checkout() {
           <div>
             <h2 className="text-sm font-black uppercase tracking-wider text-black mb-4 flex items-center gap-2">
               <span className="grid size-6 place-items-center rounded-full bg-black text-[11px] text-white">2</span>
-              Choose Payment Method
+              Payment Option
             </h2>
 
             <div className="grid gap-3">
-              {/* Option A: Direct Online UPI QR Payment */}
+              {/* Option A: Direct Online UPI Payment */}
               <div
                 className={`rounded-xl border p-4 transition-all ${
                   paymentMode === "UPI_ONLINE"
@@ -281,14 +306,14 @@ function Checkout() {
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
-                        <QrCode className="size-4 text-black" /> Scan & Pay via UPI QR
+                        <Lock className="size-3.5 text-black" /> UPI Payment (Instant QR & Apps)
                       </span>
                       <span className="rounded bg-amber-400 px-2 py-0.5 text-[10px] font-black uppercase text-black">
-                        RECOMMENDED
+                        FAST & SECURE
                       </span>
                     </div>
                     <p className="mt-1 text-[11px] font-semibold text-gray-600">
-                      Generate an instant QR code pre-filled with {currency(total)} to pay via GPay, PhonePe, Paytm, or BHIM.
+                      Pay via Google Pay, PhonePe, Paytm, BHIM, or Scan QR code ({currency(total)} pre-filled).
                     </p>
                   </div>
                 </div>
@@ -301,14 +326,14 @@ function Checkout() {
                       onClick={handleGenerateQr}
                       className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-black py-2.5 px-4 text-xs font-black uppercase tracking-wider text-white hover:bg-gray-800 transition-colors shadow-xs"
                     >
-                      <QrCode className="size-4 text-amber-400" /> Click to Generate Payment QR Card ({currency(total)})
+                      <QrCode className="size-4 text-amber-400" /> Click to Display QR Code ({currency(total)})
                       <ChevronRight className="size-4 ml-auto" />
                     </button>
                   </div>
                 )}
               </div>
 
-              {/* Option B: WhatsApp Confirm / Pay on Delivery */}
+              {/* Option B: Cash on Delivery (COD) */}
               <div
                 className={`rounded-xl border p-4 transition-all cursor-pointer ${
                   paymentMode === "WHATSAPP_COD"
@@ -333,10 +358,10 @@ function Checkout() {
                   />
                   <div className="flex-1">
                     <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
-                      <MessageCircle className="size-4 text-emerald-600" /> Confirm on WhatsApp (Pay on Delivery)
+                      <Truck className="size-4 text-emerald-600" /> Cash on Delivery (COD)
                     </span>
                     <p className="mt-1 text-[11px] font-semibold text-gray-600">
-                      Confirm stock & timing on WhatsApp. Pay via Cash or UPI when your order arrives.
+                      Pay in cash or UPI when your order is delivered to your doorstep in Panipat.
                     </p>
                   </div>
                 </div>
@@ -344,7 +369,7 @@ function Checkout() {
             </div>
           </div>
 
-          {/* Embedded Online UPI QR Section (Only shown after user clicks Generate QR) */}
+          {/* Embedded Online UPI QR Section */}
           {paymentMode === "UPI_ONLINE" && showQr && (
             <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50/60 p-4 space-y-5 transition-all animate-in fade-in-50 duration-300">
               {/* Direct Mobile App Launch Buttons */}
@@ -403,23 +428,23 @@ function Checkout() {
             </div>
           )}
 
-          {/* Submit Button */}
+          {/* Industry Grade Submit Button */}
           <Button
             type="submit"
             variant="hero"
             size="lg"
-            className="w-full font-black uppercase tracking-wider py-6"
+            className="w-full font-black uppercase tracking-wider py-6 text-sm"
             disabled={form.formState.isSubmitting}
           >
             {paymentMode === "UPI_ONLINE" ? (
               <>
-                <CreditCard className="size-5" />
-                {form.formState.isSubmitting ? "Placing Order..." : `Place Order & Pay ${currency(total)} via UPI`}
+                <Lock className="size-4 text-amber-400" />
+                {form.formState.isSubmitting ? "Placing Order..." : `Place Order & Pay ${currency(total)}`}
               </>
             ) : (
               <>
-                <MessageCircle className="size-5" />
-                {form.formState.isSubmitting ? "Placing Order..." : "Confirm Order on WhatsApp"}
+                <ShoppingBag className="size-4" />
+                {form.formState.isSubmitting ? "Placing Order..." : "Place Order (Cash on Delivery)"}
               </>
             )}
           </Button>
