@@ -107,12 +107,12 @@ function Home() {
   return (
     <div className="bg-white text-gray-900 pb-16">
       {/* 1. HERO SECTION */}
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      <section className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6">
         <div className="overflow-hidden rounded-2xl border border-gray-200 bg-[#f1f2f4]">
-          <div className="grid items-center gap-6 md:grid-cols-12">
+          <div className="grid items-center gap-4 md:gap-6 md:grid-cols-12">
             {/* Left Content Column */}
-            <div className="p-6 sm:p-10 md:p-12 md:col-span-5 lg:col-span-5">
-              <h1 className="font-sans text-4xl font-black uppercase tracking-tight text-black sm:text-5xl lg:text-6xl leading-[1.05]">
+            <div className="p-5 sm:p-10 md:p-12 md:col-span-5 lg:col-span-5">
+              <h1 className="font-sans text-3xl font-black uppercase tracking-tight text-black sm:text-5xl lg:text-6xl leading-[1.05]">
                 REAL
                 <br />
                 SUPPLEMENTS.
@@ -125,29 +125,29 @@ function Home() {
                 </span>
               </h1>
 
-              <p className="mt-6 text-sm font-semibold text-gray-700 leading-relaxed max-w-md">
+              <p className="mt-4 sm:mt-6 text-xs sm:text-sm font-semibold text-gray-700 leading-relaxed max-w-md">
                 Sameer Deshwal has been guiding lifters in Panipat on what to actually take — and what
                 to skip. Browse the catalogue, add to cart, and confirm your order on WhatsApp.
               </p>
 
-              <p className="mt-4 text-xs font-black uppercase tracking-wider text-black">
+              <p className="mt-3 sm:mt-4 text-[11px] sm:text-xs font-black uppercase tracking-wider text-black">
                 NO ADVANCE PAYMENT.
               </p>
 
-              <div className="mt-6 flex flex-wrap items-center gap-3">
+              <div className="mt-5 sm:mt-6 flex flex-wrap items-center gap-2.5 sm:gap-3">
                 <Link
                   to="/products"
-                  className="inline-flex items-center gap-2 rounded-md bg-black px-6 py-3.5 text-xs font-black uppercase tracking-wider text-white hover:bg-gray-800 transition-colors shadow-sm"
+                  className="inline-flex items-center gap-2 rounded-md bg-black px-5 sm:px-6 py-3 sm:py-3.5 text-[11px] sm:text-xs font-black uppercase tracking-wider text-white hover:bg-gray-800 transition-colors shadow-sm"
                 >
-                  SHOP SUPPLEMENTS <ArrowRight className="size-4" />
+                  SHOP SUPPLEMENTS <ArrowRight className="size-3.5 sm:size-4" />
                 </Link>
                 <a
                   href={whatsappLink("Hi OM Nutrition, I want to ask a question.")}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-5 py-3.5 text-xs font-black uppercase tracking-wider text-black hover:bg-gray-50 transition-colors shadow-xs"
+                  className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 sm:px-5 py-3 sm:py-3.5 text-[11px] sm:text-xs font-black uppercase tracking-wider text-black hover:bg-gray-50 transition-colors shadow-2xs"
                 >
-                  <MessageSquare className="size-4 text-emerald-600" /> ASK ON WHATSAPP
+                  <MessageSquare className="size-3.5 sm:size-4 text-emerald-600" /> ASK ON WHATSAPP
                 </a>
               </div>
             </div>
@@ -157,7 +157,7 @@ function Home() {
               <img
                 src="/images/hero-podium.jpg"
                 alt="Real Supplements ON Gold Standard Whey, Creatine, and MB Multivitamin"
-                className="h-full w-full object-cover object-center max-h-[480px] md:max-h-[540px]"
+                className="h-full w-full object-cover object-center max-h-[280px] sm:max-h-[400px] md:max-h-[540px]"
               />
             </div>
           </div>
@@ -165,34 +165,34 @@ function Home() {
       </section>
 
       {/* 2. 4-VALUE PROPOSITION STRIP */}
-      <section className="mx-auto max-w-7xl px-4 py-3 sm:px-6">
-        <div className="grid grid-cols-2 divide-x divide-y md:divide-y-0 md:grid-cols-4 rounded-lg border border-gray-200 bg-white py-4 shadow-2xs">
-          <div className="flex items-center gap-3 px-4 py-2 justify-center text-center md:text-left">
-            <ShieldCheck className="size-6 shrink-0 text-black" />
+      <section className="mx-auto max-w-7xl px-3 py-2 sm:px-6">
+        <div className="grid grid-cols-2 divide-x divide-y md:divide-y-0 md:grid-cols-4 rounded-lg border border-gray-200 bg-white py-3 sm:py-4 shadow-2xs">
+          <div className="flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-2 justify-center text-center md:text-left">
+            <ShieldCheck className="size-5 sm:size-6 shrink-0 text-black" />
             <div>
-              <p className="text-xs font-black uppercase tracking-tight text-black">100%</p>
-              <p className="text-[11px] font-extrabold uppercase tracking-tight text-gray-700">SEALED & GENUINE</p>
+              <p className="text-[11px] sm:text-xs font-black uppercase tracking-tight text-black">100%</p>
+              <p className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-tight text-gray-700">SEALED & GENUINE</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 px-4 py-2 justify-center text-center md:text-left">
-            <Truck className="size-6 shrink-0 text-black" />
+          <div className="flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-2 justify-center text-center md:text-left">
+            <Truck className="size-5 sm:size-6 shrink-0 text-black" />
             <div>
-              <p className="text-xs font-black uppercase tracking-tight text-black">SAME-DAY</p>
-              <p className="text-[11px] font-extrabold uppercase tracking-tight text-gray-700">LOCAL DELIVERY</p>
+              <p className="text-[11px] sm:text-xs font-black uppercase tracking-tight text-black">SAME-DAY</p>
+              <p className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-tight text-gray-700">LOCAL DELIVERY</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 px-4 py-2 justify-center text-center md:text-left">
-            <span className="text-xl font-black text-black">₹</span>
+          <div className="flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-2 justify-center text-center md:text-left">
+            <span className="text-lg sm:text-xl font-black text-black">₹</span>
             <div>
-              <p className="text-xs font-black uppercase tracking-tight text-black">₹0</p>
-              <p className="text-[11px] font-extrabold uppercase tracking-tight text-gray-700">ADVANCE PAYMENT</p>
+              <p className="text-[11px] sm:text-xs font-black uppercase tracking-tight text-black">₹0</p>
+              <p className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-tight text-gray-700">ADVANCE PAYMENT</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 px-4 py-2 justify-center text-center md:text-left">
-            <UserCheck className="size-6 shrink-0 text-black" />
+          <div className="flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-2 justify-center text-center md:text-left">
+            <UserCheck className="size-5 sm:size-6 shrink-0 text-black" />
             <div>
-              <p className="text-xs font-black uppercase tracking-tight text-black">TRUSTED BY</p>
-              <p className="text-[11px] font-extrabold uppercase tracking-tight text-gray-700">1000+ LIFTERS</p>
+              <p className="text-[11px] sm:text-xs font-black uppercase tracking-tight text-black">TRUSTED BY</p>
+              <p className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-tight text-gray-700">1000+ LIFTERS</p>
             </div>
           </div>
         </div>
