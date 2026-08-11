@@ -15,6 +15,7 @@ import { currency, site, whatsappLink } from "@/lib/site";
 import { cartTotal, useCart } from "@/store/cart";
 import { createUpiUrl } from "@/lib/upi";
 import { generateQrDataUrl } from "@/lib/qr";
+import { MobilePayButtons } from "@/components/upi/MobilePayButtons";
 
 const schema = z.object({
   customer_name: z.string().trim().min(2, "Please enter your full name").max(80),
@@ -345,10 +346,15 @@ function Checkout() {
 
           {/* Embedded Online UPI QR Section (Only shown after user clicks Generate QR) */}
           {paymentMode === "UPI_ONLINE" && showQr && (
-            <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50/60 p-4 transition-all animate-in fade-in-50 duration-300">
+            <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50/60 p-4 space-y-5 transition-all animate-in fade-in-50 duration-300">
+              {/* Direct Mobile App Launch Buttons */}
+              <MobilePayButtons amount={total} upiId={upiId} payeeName={payeeName} />
+
+              <hr className="border-amber-200" />
+
               <div className="flex items-center justify-between pb-3 border-b border-amber-200">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-wider text-black">Scan to Pay Exact Amount</p>
+                  <p className="text-xs font-black uppercase tracking-wider text-black">Or Scan QR Code to Pay</p>
                   <p className="text-[11px] font-bold text-amber-900">Pre-filled Amount: {currency(total)}</p>
                 </div>
                 <span className="text-xs font-mono font-bold bg-white border border-amber-300 px-2 py-1 rounded text-black">

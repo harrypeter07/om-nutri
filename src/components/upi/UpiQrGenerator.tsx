@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { ActionButtons } from "./ActionButtons";
+import { MobilePayButtons } from "./MobilePayButtons";
 import { QrPreview } from "./QrPreview";
 import { UpiForm } from "./UpiForm";
 import { createUpiUrl, validateAmount, validateUpiId } from "@/lib/upi";
@@ -106,7 +107,7 @@ export function UpiQrGenerator({
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full space-y-6">
       {/* Header section if provided */}
       {title && (
         <div className="mb-6 text-center">
@@ -150,13 +151,19 @@ export function UpiQrGenerator({
             isLoading={isGenerating}
           />
 
-          <div className="pt-2">
+          <div className="pt-2 space-y-4">
             <ActionButtons
               qrDataUrl={qrDataUrl}
               upiUrl={upiUrl}
               amount={amount}
               onReset={handleReset}
               disabled={isGenerating || !!upiIdError || !!amountError}
+            />
+
+            <MobilePayButtons
+              amount={amount || 0}
+              upiId={upiId}
+              payeeName={payeeName}
             />
           </div>
         </div>

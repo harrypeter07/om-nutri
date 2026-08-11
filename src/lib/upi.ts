@@ -35,6 +35,30 @@ export function createUpiUrl({
 }
 
 /**
+ * Generates app-specific deep link for direct opening on mobile.
+ */
+export function getAppUpiLink(
+  app: "gpay" | "phonepe" | "paytm" | "bhim" | "generic",
+  params: UpiParams
+): string {
+  const genericUrl = createUpiUrl(params);
+  const rawQuery = genericUrl.replace("upi://pay?", "");
+
+  switch (app) {
+    case "gpay":
+      return `gpay://upi/pay?${rawQuery}`;
+    case "phonepe":
+      return `phonepe://pay?${rawQuery}`;
+    case "paytm":
+      return `paytmmp://pay?${rawQuery}`;
+    case "bhim":
+      return `bhim://pay?${rawQuery}`;
+    default:
+      return genericUrl;
+  }
+}
+
+/**
  * Basic non-restrictive UPI ID validation.
  */
 export function validateUpiId(upiId: string): string | null {
@@ -78,3 +102,4 @@ export function getUpiQrFilename(amount: number | string): string {
   const formatted = num % 1 === 0 ? num.toFixed(0) : num.toFixed(2);
   return `upi-qr-${formatted}.png`;
 }
+
