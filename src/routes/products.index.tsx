@@ -15,7 +15,12 @@ import {
 import { getCategories, getProducts } from "@/lib/catalog.functions";
 import type { Product } from "@/lib/catalog-types";
 
-const searchSchema = z.object({ category: z.string().optional() });
+import { smartSearchProducts } from "@/lib/search";
+
+const searchSchema = z.object({
+  category: z.string().optional(),
+  search: z.string().optional(),
+});
 
 export const Route = createFileRoute("/products/")({
   validateSearch: searchSchema,
@@ -50,11 +55,14 @@ function Products() {
     categories: { id: string; name: string; slug: string }[];
     products: Product[];
   };
-  const { category } = Route.useSearch();
+  const { category, search } = Route.useSearch();
   const [sort, setSort] = useState<Sort>("featured");
 
   const visible = useMemo(() => {
-    const list = category ? products.filter((p) => p.category?.slug === category) : [...products];
+    let list = category ? products.filter((p) => p.category?.slug === category) : [...products];
+    if (search && search.trim()) {
+      list = smartSearchProducts(list, search.trim());
+    }
     switch (sort) {
       case "price-asc":
         return list.sort((a, b) => Number(a.price) - Number(b.price));
@@ -65,7 +73,7 @@ function Products() {
       default:
         return list.sort((a, b) => Number(b.is_featured) - Number(a.is_featured));
     }
-  }, [products, category, sort]);
+  }, [products, category, search, sort]);
 
   const activeName = categories.find((c) => c.slug === category)?.name;
 

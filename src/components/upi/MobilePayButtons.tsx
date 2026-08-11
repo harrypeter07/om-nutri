@@ -1,5 +1,4 @@
 import { ArrowUpRight, Smartphone } from "lucide-react";
-import { toast } from "sonner";
 import { createUpiUrl, getAppUpiLink } from "@/lib/upi";
 
 interface MobilePayButtonsProps {
@@ -23,11 +22,6 @@ export function MobilePayButtons({
   const phonepeUrl = getAppUpiLink("phonepe", upiParams);
   const paytmUrl = getAppUpiLink("paytm", upiParams);
 
-  const handleAppClick = (url: string, appName: string) => {
-    window.location.href = url;
-    toast.info(`Opening ${appName}...`);
-  };
-
   return (
     <div className="space-y-2.5">
       <div className="flex items-center justify-between">
@@ -38,10 +32,11 @@ export function MobilePayButtons({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        {/* Google Pay */}
-        <button
-          type="button"
-          onClick={() => handleAppClick(gpayUrl, "Google Pay")}
+        {/* Google Pay Direct Anchor Link */}
+        <a
+          href={gpayUrl}
+          target="_self"
+          rel="noreferrer"
           className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3 hover:border-blue-500 hover:bg-blue-50/50 transition-all shadow-2xs group"
         >
           <div className="flex items-center gap-2">
@@ -49,12 +44,13 @@ export function MobilePayButtons({
             <span className="text-xs font-black text-black group-hover:text-blue-600">GPay</span>
           </div>
           <ArrowUpRight className="size-3.5 text-gray-400 group-hover:text-blue-600" />
-        </button>
+        </a>
 
-        {/* PhonePe */}
-        <button
-          type="button"
-          onClick={() => handleAppClick(phonepeUrl, "PhonePe")}
+        {/* PhonePe Direct Anchor Link */}
+        <a
+          href={phonepeUrl}
+          target="_self"
+          rel="noreferrer"
           className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3 hover:border-purple-600 hover:bg-purple-50/50 transition-all shadow-2xs group"
         >
           <div className="flex items-center gap-2">
@@ -62,12 +58,13 @@ export function MobilePayButtons({
             <span className="text-xs font-black text-black group-hover:text-purple-700">PhonePe</span>
           </div>
           <ArrowUpRight className="size-3.5 text-gray-400 group-hover:text-purple-700" />
-        </button>
+        </a>
 
-        {/* Paytm */}
-        <button
-          type="button"
-          onClick={() => handleAppClick(paytmUrl, "Paytm")}
+        {/* Paytm Direct Anchor Link */}
+        <a
+          href={paytmUrl}
+          target="_self"
+          rel="noreferrer"
           className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-3 hover:border-cyan-600 hover:bg-cyan-50/50 transition-all shadow-2xs group"
         >
           <div className="flex items-center gap-2">
@@ -75,12 +72,13 @@ export function MobilePayButtons({
             <span className="text-xs font-black text-black group-hover:text-cyan-600">Paytm</span>
           </div>
           <ArrowUpRight className="size-3.5 text-gray-400 group-hover:text-cyan-600" />
-        </button>
+        </a>
 
-        {/* Any UPI App */}
-        <button
-          type="button"
-          onClick={() => handleAppClick(genericUrl, "UPI App")}
+        {/* Any UPI App Direct Anchor Link */}
+        <a
+          href={genericUrl}
+          target="_self"
+          rel="noreferrer"
           className="flex items-center justify-between rounded-xl border border-black bg-black p-3 hover:bg-gray-800 transition-all shadow-2xs group text-white"
         >
           <div className="flex items-center gap-2">
@@ -88,7 +86,7 @@ export function MobilePayButtons({
             <span className="text-xs font-black text-white">Any UPI</span>
           </div>
           <ArrowUpRight className="size-3.5 text-amber-400" />
-        </button>
+        </a>
       </div>
     </div>
   );

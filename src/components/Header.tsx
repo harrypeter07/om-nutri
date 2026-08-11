@@ -1,6 +1,6 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ChevronDown, MapPin, Menu, MessageSquare, Search, ShieldCheck, ShoppingCart, Truck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { site, whatsappLink } from "@/lib/site";
@@ -21,11 +21,35 @@ export function Header() {
   const [mounted, setMounted] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const routerState = useRouterState();
   const currentPath = routerState.location.pathname;
+  const navigate = useNavigate();
+  const searchBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => setMounted(true), []);
-  const count = mounted ? cartCount(items) : 2; // Default 2 as shown in screenshot
+  const count = mounted ? cartCount(items) : 2;
+
+  // Handle outside click to close search suggestions
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(e.target as Node)) {
+        setIsSearchFocused(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setIsSearchFocused(false);
+    navigate({
+      to: "/products",
+      search: { search: searchQuery.trim() },
+    });
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white">
@@ -153,22 +177,48 @@ export function Header() {
             <ChevronDown className="size-3 sm:size-4 text-gray-500" />
           </div>
 
-          {/* Search Input Box */}
-          <div className="flex h-9 sm:h-11 flex-1 items-center rounded-md border border-gray-300 bg-white shadow-2xs overflow-hidden focus-within:ring-2 focus-within:ring-black">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search supplements, brands..."
-              className="h-full flex-1 px-3 text-xs font-semibold text-gray-900 placeholder:text-gray-400 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="grid h-full aspect-square place-items-center bg-black text-white hover:bg-gray-800 transition-colors shrink-0"
-              aria-label="Search"
+          {/* Search Input Form Container with Smart Dropdown */}
+          <div ref={searchBoxRef} className="relative flex-1">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="flex h-9 sm:h-11 w-full items-center rounded-md border border-gray-300 bg-white shadow-2xs overflow-hidden focus-within:ring-2 focus-within:ring-black"
             >
-              <Search className="size-3.5 sm:size-4" />
-            </button>
+              <input
+                type="text"
+                value={searchQuery}
+                onFocus={() => setIsSearchFocused(true)}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search supplements, brands (e.g. protin, creatin)..."
+                className="h-full flex-1 px-3 text-xs font-semibold text-gray-900 placeholder:text-gray-400 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="grid h-full aspect-square place-items-center bg-black text-white hover:bg-gray-800 transition-colors shrink-0"
+                aria-label="Search"
+              >
+                <Search className="size-3.5 sm:size-4" />
+              </button>
+            </form>
+
+            {/* Quick Live Search Suggestions Dropdown */}
+            {isSearchFocused && searchQuery.trim().length > 0 && (
+              <div className="absolute left-0 right-0 top-full mt-1.5 rounded-xl border border-gray-200 bg-white p-2 shadow-xl z-50 animate-in fade-in-50 duration-150">
+                <p className="px-2 py-1 text-[10px] font-black uppercase text-gray-400">Smart Search Suggestions</p>
+                <div className="divide-y divide-gray-100">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsSearchFocused(false);
+                      navigate({ to: "/products", search: { search: searchQuery.trim() } });
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs font-extrabold text-black hover:bg-amber-50 rounded flex items-center justify-between"
+                  >
+                    <span>Search for "<strong className="text-amber-600">{searchQuery.trim()}</strong>"</span>
+                    <Search className="size-3 text-gray-400" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 100% Authentic Badge */}
@@ -181,4 +231,5 @@ export function Header() {
     </header>
   );
 }
+
 
