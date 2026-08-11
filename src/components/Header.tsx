@@ -9,6 +9,7 @@ import { cartCount, useCart } from "@/store/cart";
 const navLinks = [
   { to: "/products", label: "SHOP" },
   { to: "/products", search: { category: "whey-protein" }, label: "CATEGORIES" },
+  { to: "/upi", label: "UPI PAY" },
   { to: "/about", label: "ABOUT US" },
   { to: "/reviews", label: "OFFERS" },
   { to: "/contact", label: "CONTACT" },

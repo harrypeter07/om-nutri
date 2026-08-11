@@ -17,6 +17,7 @@ import { Route as CartRouteImport } from './routes/cart'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ReviewsRouteImport } from './routes/reviews'
+import { Route as UpiRouteImport } from './routes/upi'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as ProductsIndexRouteImport } from './routes/products.index'
 import { Route as ProductsSlugRouteImport } from './routes/products.$slug'
@@ -60,6 +61,11 @@ const ReviewsRoute = ReviewsRouteImport.update({
   path: '/reviews',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UpiRoute = UpiRouteImport.update({
+  id: '/upi',
+  path: '/upi',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/reviews': typeof ReviewsRoute
+  '/upi': typeof UpiRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/products/': typeof ProductsIndexRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/reviews': typeof ReviewsRoute
+  '/upi': typeof UpiRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/products': typeof ProductsIndexRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/contact': typeof ContactRoute
   '/reviews': typeof ReviewsRoute
+  '/upi': typeof UpiRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/products/$slug': typeof ProductsSlugRoute
   '/products/': typeof ProductsIndexRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/reviews'
+    | '/upi'
     | '/admin'
     | '/products/$slug'
     | '/products/'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/reviews'
+    | '/upi'
     | '/admin'
     | '/products/$slug'
     | '/products'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/contact'
     | '/reviews'
+    | '/upi'
     | '/_authenticated/admin'
     | '/products/$slug'
     | '/products/'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   ContactRoute: typeof ContactRoute
   ReviewsRoute: typeof ReviewsRoute
+  UpiRoute: typeof UpiRoute
   ProductsSlugRoute: typeof ProductsSlugRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
 }
@@ -225,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReviewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/upi': {
+      id: '/upi'
+      path: '/upi'
+      fullPath: '/upi'
+      preLoaderRoute: typeof UpiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
@@ -269,6 +289,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   ContactRoute: ContactRoute,
   ReviewsRoute: ReviewsRoute,
+  UpiRoute: UpiRoute,
   ProductsSlugRoute: ProductsSlugRoute,
   ProductsIndexRoute: ProductsIndexRoute,
 }
