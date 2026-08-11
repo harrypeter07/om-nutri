@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { CheckCircle2, MessageCircle, QrCode, ShieldCheck, CreditCard, Sparkles } from "lucide-react";
+import { CheckCircle2, MessageCircle, QrCode, ShieldCheck, CreditCard, Sparkles, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -58,27 +58,38 @@ function Checkout() {
   const { items, clear } = useCart();
   const total = cartTotal(items);
   const [placed, setPlaced] = useState<{ message: string; paymentMode: "UPI_ONLINE" | "WHATSAPP_COD" } | null>(null);
-  const [paymentMode, setPaymentMode] = useState<"UPI_ONLINE" | "WHATSAPP_COD">("UPI_ONLINE");
+  const [paymentMode, setPaymentMode] = useState<"UPI_ONLINE" | "WHATSAPP_COD">("WHATSAPP_COD");
+  const [showQr, setShowQr] = useState<boolean>(false);
   const [upiQrUrl, setUpiQrUrl] = useState<string | null>(null);
+  const [isGeneratingQr, setIsGeneratingQr] = useState<boolean>(false);
   const [utrNumber, setUtrNumber] = useState<string>("");
 
   const upiId = "9322909257@ybl";
   const payeeName = "OM Nutrition";
 
-  // Generate QR for the exact cart total
-  useEffect(() => {
-    if (total > 0) {
+  // Generate QR only when user explicitly clicks / requests QR Code
+  const handleGenerateQr = async () => {
+    if (total <= 0) return;
+    setIsGeneratingQr(true);
+    setShowQr(true);
+    setPaymentMode("UPI_ONLINE");
+
+    try {
       const upiDeepLink = createUpiUrl({
         upiId,
         payeeName,
         amount: total,
         transactionNote: `Order OM Nutrition ₹${total}`,
       });
-      generateQrDataUrl(upiDeepLink, { width: 500, margin: 2 })
-        .then((url) => setUpiQrUrl(url))
-        .catch(() => setUpiQrUrl(null));
+      const url = await generateQrDataUrl(upiDeepLink, { width: 500, margin: 2 });
+      setUpiQrUrl(url);
+    } catch {
+      setUpiQrUrl(null);
+      toast.error("Failed to generate QR code");
+    } finally {
+      setIsGeneratingQr(false);
     }
-  }, [total]);
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -96,7 +107,7 @@ function Checkout() {
         </h1>
         <p className="mt-3 text-sm font-medium text-gray-600 leading-relaxed">
           {placed.paymentMode === "UPI_ONLINE"
-            ? `Thank you! Your order has been placed. We've sent details to ${site.owner} on WhatsApp to verify payment & dispatch.`
+            ? `Thank you! Your order has been placed. We've sent order details to ${site.owner} on WhatsApp to verify your payment & dispatch.`
             : `We've opened WhatsApp with your order summary — hit send so ${site.owner} can confirm stock and delivery.`}
         </p>
 
@@ -248,71 +259,97 @@ function Checkout() {
 
             <div className="grid gap-3">
               {/* Option A: Direct Online UPI QR Payment */}
-              <label
-                onClick={() => setPaymentMode("UPI_ONLINE")}
-                className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all ${
+              <div
+                className={`rounded-xl border p-4 transition-all ${
                   paymentMode === "UPI_ONLINE"
                     ? "border-black bg-amber-50/50 ring-2 ring-black"
                     : "border-gray-200 bg-white hover:border-gray-300"
                 }`}
               >
-                <input
-                  type="radio"
-                  name="paymentMode"
-                  checked={paymentMode === "UPI_ONLINE"}
-                  onChange={() => setPaymentMode("UPI_ONLINE")}
-                  className="mt-1 size-4 accent-black"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
-                      <QrCode className="size-4 text-black" /> Scan & Pay via UPI QR
-                    </span>
-                    <span className="rounded bg-amber-400 px-2 py-0.5 text-[10px] font-black uppercase text-black">
-                      RECOMMENDED
-                    </span>
+                <div
+                  className="flex cursor-pointer items-start gap-3"
+                  onClick={() => setPaymentMode("UPI_ONLINE")}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMode"
+                    checked={paymentMode === "UPI_ONLINE"}
+                    onChange={() => setPaymentMode("UPI_ONLINE")}
+                    className="mt-1 size-4 accent-black"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
+                        <QrCode className="size-4 text-black" /> Scan & Pay via UPI QR
+                      </span>
+                      <span className="rounded bg-amber-400 px-2 py-0.5 text-[10px] font-black uppercase text-black">
+                        RECOMMENDED
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[11px] font-semibold text-gray-600">
+                      Generate an instant QR code pre-filled with {currency(total)} to pay via GPay, PhonePe, Paytm, or BHIM.
+                    </p>
                   </div>
-                  <p className="mt-1 text-[11px] font-semibold text-gray-600">
-                    Instant QR generated for exact cart total ({currency(total)}). Pay with GPay, PhonePe, Paytm or BHIM.
-                  </p>
                 </div>
-              </label>
+
+                {/* Explicit Generate QR Button */}
+                {paymentMode === "UPI_ONLINE" && !showQr && (
+                  <div className="mt-4 pt-3 border-t border-amber-200/80">
+                    <button
+                      type="button"
+                      onClick={handleGenerateQr}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-black py-2.5 px-4 text-xs font-black uppercase tracking-wider text-white hover:bg-gray-800 transition-colors shadow-xs"
+                    >
+                      <QrCode className="size-4 text-amber-400" /> Click to Generate Payment QR Card ({currency(total)})
+                      <ChevronRight className="size-4 ml-auto" />
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* Option B: WhatsApp Confirm / Pay on Delivery */}
-              <label
-                onClick={() => setPaymentMode("WHATSAPP_COD")}
-                className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all ${
+              <div
+                className={`rounded-xl border p-4 transition-all cursor-pointer ${
                   paymentMode === "WHATSAPP_COD"
                     ? "border-black bg-gray-50 ring-2 ring-black"
                     : "border-gray-200 bg-white hover:border-gray-300"
                 }`}
+                onClick={() => {
+                  setPaymentMode("WHATSAPP_COD");
+                  setShowQr(false);
+                }}
               >
-                <input
-                  type="radio"
-                  name="paymentMode"
-                  checked={paymentMode === "WHATSAPP_COD"}
-                  onChange={() => setPaymentMode("WHATSAPP_COD")}
-                  className="mt-1 size-4 accent-black"
-                />
-                <div className="flex-1">
-                  <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
-                    <MessageCircle className="size-4 text-emerald-600" /> Confirm on WhatsApp (Pay on Delivery)
-                  </span>
-                  <p className="mt-1 text-[11px] font-semibold text-gray-600">
-                    Confirm stock & timing on WhatsApp. Pay via Cash or UPI when your order arrives.
-                  </p>
+                <div className="flex items-start gap-3">
+                  <input
+                    type="radio"
+                    name="paymentMode"
+                    checked={paymentMode === "WHATSAPP_COD"}
+                    onChange={() => {
+                      setPaymentMode("WHATSAPP_COD");
+                      setShowQr(false);
+                    }}
+                    className="mt-1 size-4 accent-black"
+                  />
+                  <div className="flex-1">
+                    <span className="text-xs font-black uppercase tracking-wider text-black flex items-center gap-1.5">
+                      <MessageCircle className="size-4 text-emerald-600" /> Confirm on WhatsApp (Pay on Delivery)
+                    </span>
+                    <p className="mt-1 text-[11px] font-semibold text-gray-600">
+                      Confirm stock & timing on WhatsApp. Pay via Cash or UPI when your order arrives.
+                    </p>
+                  </div>
                 </div>
-              </label>
+              </div>
             </div>
           </div>
 
-          {/* Embedded Online UPI QR Section */}
-          {paymentMode === "UPI_ONLINE" && (
-            <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/40 p-4">
+          {/* Embedded Online UPI QR Section (Only shown after user clicks Generate QR) */}
+          {paymentMode === "UPI_ONLINE" && showQr && (
+            <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50/60 p-4 transition-all animate-in fade-in-50 duration-300">
               <div className="flex items-center justify-between pb-3 border-b border-amber-200">
                 <div>
                   <p className="text-xs font-black uppercase tracking-wider text-black">Scan to Pay Exact Amount</p>
-                  <p className="text-[11px] font-bold text-amber-800">Pre-filled Amount: {currency(total)}</p>
+                  <p className="text-[11px] font-bold text-amber-900">Pre-filled Amount: {currency(total)}</p>
                 </div>
                 <span className="text-xs font-mono font-bold bg-white border border-amber-300 px-2 py-1 rounded text-black">
                   {upiId}
@@ -320,21 +357,25 @@ function Checkout() {
               </div>
 
               <div className="mt-4 flex flex-col sm:flex-row items-center gap-4">
-                {upiQrUrl ? (
-                  <div className="bg-white p-2 rounded-lg border border-gray-300 shadow-2xs shrink-0">
+                {isGeneratingQr ? (
+                  <div className="size-36 bg-gray-100 animate-pulse rounded-lg grid place-items-center text-xs font-semibold text-gray-400">
+                    Generating QR...
+                  </div>
+                ) : upiQrUrl ? (
+                  <div className="bg-white p-2.5 rounded-lg border border-gray-300 shadow-2xs shrink-0">
                     <img src={upiQrUrl} alt="Order Payment UPI QR Code" className="size-36 object-contain" />
                   </div>
                 ) : (
-                  <div className="size-36 bg-gray-100 animate-pulse rounded-lg grid place-items-center text-xs font-semibold text-gray-400">
-                    Generating QR...
+                  <div className="size-36 bg-gray-100 rounded-lg grid place-items-center text-xs font-semibold text-gray-400">
+                    QR Unavailable
                   </div>
                 )}
                 <div className="flex-1 space-y-2 text-xs">
                   <p className="font-extrabold text-black flex items-center gap-1">
-                    <Sparkles className="size-3.5 text-amber-500" /> How to Pay:
+                    <Sparkles className="size-3.5 text-amber-500" /> Instructions:
                   </p>
                   <ol className="list-decimal list-inside space-y-1 text-gray-700 font-medium text-[11px]">
-                    <li>Open Google Pay, PhonePe, Paytm, or any UPI app.</li>
+                    <li>Open GPay, PhonePe, Paytm, or any UPI app.</li>
                     <li>Scan this QR code — amount <strong className="text-black font-black">{currency(total)}</strong> is pre-filled.</li>
                     <li>Complete payment in your app.</li>
                   </ol>
@@ -415,5 +456,3 @@ function FieldError({ message }: { message?: string | undefined }) {
   if (!message) return null;
   return <p className="mt-1 text-xs font-semibold text-red-600">{message}</p>;
 }
-
-
